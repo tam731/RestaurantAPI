@@ -1,8 +1,8 @@
-﻿using Restaurants.Domain.Common;
+﻿
 
-namespace Restaurants.Domain.Entities
+namespace Restaurants.Application.Dishes.Dtos
 {
-    public class Dish : BaseEntity
+    public class DishDto
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;

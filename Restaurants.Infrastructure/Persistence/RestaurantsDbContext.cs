@@ -1,18 +1,12 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Restaurants.Domain.Entities;
 
 namespace Restaurants.Infrastructure.Persistence
 {
-    public class RestaurantsDbContext:DbContext
+    internal class RestaurantsDbContext(DbContextOptions<RestaurantsDbContext> options) : DbContext(options)
     {
-        public DbSet<Restaurant> Restaurants { get; set;}
-        public DbSet<Dish> Dishes { get; set;}
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
+        internal DbSet<Restaurant> Restaurants { get; set; }
+        internal DbSet<Dish> Dishes { get; set; }
+        internal DbSet<Address> Addresses { get; set; }
     }
 }
