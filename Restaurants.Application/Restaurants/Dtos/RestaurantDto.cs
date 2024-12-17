@@ -1,10 +1,8 @@
-﻿
+﻿using Restaurants.Application.Dishes.DTOs;
 
-using Restaurants.Application.Dishes.Dtos;
-
-namespace Restaurants.Application.Restaurants.Dtos
+namespace Restaurants.Application.Restaurants.DTOs
 {
-    public class RestaurantDto
+    public class RestaurantDTO
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
@@ -15,6 +13,6 @@ namespace Restaurants.Application.Restaurants.Dtos
         public string? Street { get; set; }
         public string? PostalCode { get; set; }
 
-        public List<DishDto> Dishes { get; set; } = [];
+        public List<DishDTO> Dishes { get; set; } = [];
     }
 }

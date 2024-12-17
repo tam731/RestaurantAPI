@@ -1,8 +1,8 @@
 ﻿
 
-namespace Restaurants.Application.Dishes.Dtos
+namespace Restaurants.Application.Dishes.DTOs
 {
-    public class DishDto
+    public class DishDTO
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
