@@ -12,17 +12,12 @@ public class CreateRestaurantCommandHandler(IRestaurantsRepository restaurantsRe
 {
     public async Task<int> Handle(CreateRestaurantCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
+
             var restaurant = mapper.Map<Restaurant>(request);
 
             int id = await restaurantsRepository.CreateAsync(restaurant);
             return id;
-        }
-        catch (Exception e)
-        {
-            logger.LogInformation("Create error: " + e.Message);
-            throw new Exception(e.Message);
-        }
+        
+   
     }
 }

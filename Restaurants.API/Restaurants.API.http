@@ -20,3 +20,15 @@ Content-Type: application/json
 DELETE {{Restaurants.API_HostAddress}}/api/restaurants/3
 
 ###
+
+PATCH {{Restaurants.API_HostAddress}}/api/restaurants/4
+Content-Type: application/json
+
+{
+  //UpdateRestaurantCommand
+  "Name":"OK 1",
+  "Description":"This is a sample description",
+  "HasDelivery": true
+}
+
+###

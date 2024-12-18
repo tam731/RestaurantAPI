@@ -28,8 +28,14 @@ namespace Restaurants.Infrastructure.Repositories
 
         public async Task<Restaurant?> GetByIdAsync(int id)
         {
-            var restaurant = await dbContext.Restaurants.FirstOrDefaultAsync(x => x.Id == id);
+            var restaurant = await dbContext.Restaurants.Include(r=>r.Dishes).FirstOrDefaultAsync(x => x.Id == id);
             return restaurant;
         }
+
+
+
+        public Task SaveChangeAsync()=> dbContext.SaveChangesAsync();
+        
+        
     }
 }
