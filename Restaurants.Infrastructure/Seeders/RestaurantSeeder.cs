@@ -1,9 +1,12 @@
-﻿using Restaurants.Domain.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+using Restaurants.Domain.Constants;
+using Restaurants.Domain.Entities;
+using Restaurants.Domain.Entities.Identity;
 using Restaurants.Infrastructure.Persistence;
 
 namespace Restaurants.Infrastructure.Seeders
 {
-    internal class RestaurantSeeder(RestaurantsDbContext dbContext) :  IRestaurantSeeder
+    internal class RestaurantSeeder(UserManager<User> userManager,RestaurantsDbContext dbContext) :  IRestaurantSeeder
     {
         public async Task Seed()
         {
@@ -15,7 +18,74 @@ namespace Restaurants.Infrastructure.Seeders
                     dbContext.Restaurants.AddRange(restaurants);
                     await dbContext.SaveChangesAsync();
                 }
+
+                if (!dbContext.Roles.Any())
+                {
+                    dbContext.Roles.AddRange(GetRoles());
+                    await dbContext.SaveChangesAsync();
+                }
+
+                if (!dbContext.Users.Any())
+                {
+                    var users = GetUsers();
+                    foreach (var user in users)
+                    {
+                        await userManager.CreateAsync(user, "User123@");
+                        switch (user.Email)
+                        {
+                            case "admin@test.com":
+                                await userManager.AddToRoleAsync(user, UserRoles.Admin);
+                                break;
+                            case "owner@test.com":
+                                await userManager.AddToRoleAsync(user, UserRoles.Owner);
+                                break;
+                            case "user@test.com":
+                                await userManager.AddToRoleAsync(user, UserRoles.User);
+                                break;
+
+                        }
+
+                    }
+                }
+
             }
+        }
+        private IEnumerable<IdentityRole> GetRoles()
+        {
+            List<IdentityRole> roles =
+                [
+                   new (UserRoles.User){
+                       NormalizedName=UserRoles.User.ToUpper()
+                   },
+                   new (UserRoles.Owner){
+                       NormalizedName=UserRoles.Owner.ToUpper()
+                   },
+                   new (UserRoles.Admin){
+                       NormalizedName=UserRoles.Admin.ToUpper()
+                   }
+                ];
+            return roles;
+        }
+        private IEnumerable<User> GetUsers()
+        {
+             IEnumerable<User> users = [
+                new (){
+                    UserName="admin@test.com",
+                    NormalizedEmail="admin@test.com".ToUpper(),
+                    Email="admin@test.com",
+                },
+                new (){
+                     UserName="owner@test.com",
+                    NormalizedEmail="owner@test.com".ToUpper(),
+                    Email="owner@test.com",
+                },
+                new (){
+                     UserName="user@test.com",
+                    NormalizedEmail="user@test.com".ToUpper(),
+                    Email="user@test.com",
+                }
+                ];
+            return users;
         }
         private IEnumerable<Restaurant> GetRestaurants()
         {
