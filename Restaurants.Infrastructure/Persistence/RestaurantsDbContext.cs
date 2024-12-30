@@ -11,5 +11,15 @@ namespace Restaurants.Infrastructure.Persistence
         internal DbSet<Restaurant> Restaurants { get; set; }
         internal DbSet<Dish> Dishes { get; set; }
         internal DbSet<Address> Addresses { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<User>()
+                .HasMany(o => o.OwnedRestaurants)
+                .WithOne(r => r.Owner)
+                .HasForeignKey(r => r.OwnerId);
+
+        }
     }
 }

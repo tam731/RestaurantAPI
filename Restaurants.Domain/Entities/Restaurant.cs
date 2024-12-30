@@ -1,4 +1,5 @@
 ﻿using Restaurants.Domain.Common;
+using Restaurants.Domain.Entities.Identity;
 
 namespace Restaurants.Domain.Entities
 {
@@ -14,5 +15,8 @@ namespace Restaurants.Domain.Entities
 
         public Address? Address { get; set; }
         public List<Dish> Dishes { get; set; } = [];
+
+        public User Owner { get; set; }=default!;
+        public string OwnerId { get; set; } = default!;
     }
 }
