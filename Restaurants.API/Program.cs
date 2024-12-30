@@ -1,5 +1,5 @@
 using Restaurants.API.Extensions;
-using Restaurants.API.Middlewares;
+using Restaurants.API.MiddleWares;
 using Restaurants.Application.Extensions;
 using Restaurants.Domain.Entities.Identity;
 using Restaurants.Infrastructure.Extensions;
