@@ -14,7 +14,7 @@ namespace Restaurants.Application.Users
             var user = httpContextAccessor?.HttpContext?.User;
             if (user == null)
             {
-                throw new InvalidCastException("User context is not present");
+                throw new InvalidOperationException("User context is not present");
             }
             if (user.Identity == null || !user.Identity.IsAuthenticated)
             {

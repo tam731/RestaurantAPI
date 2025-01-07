@@ -2,7 +2,7 @@ using FluentAssertions;
 using Restaurants.Application.Users;
 using Restaurants.Domain.Constants;
 
-namespace Restaurants.Application.Tests;
+namespace Restaurants.Application.Tests.Users;
 
 public class CurrentUserTests
 {
@@ -16,7 +16,7 @@ public class CurrentUserTests
         var currentUser = new CurrentUser("1", "test1@test.com", [UserRoles.Admin, UserRoles.User], null, null);
 
         //act
-        bool isInRole= currentUser.IsInRole(roleName);
+        bool isInRole = currentUser.IsInRole(roleName);
 
         //assert
         isInRole.Should().BeTrue();
