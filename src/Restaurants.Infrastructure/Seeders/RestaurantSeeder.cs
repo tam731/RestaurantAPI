@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Restaurants.Domain.Constants;
 using Restaurants.Domain.Entities;
 using Restaurants.Domain.Entities.Identity;
@@ -10,6 +11,10 @@ namespace Restaurants.Infrastructure.Seeders
     {
         public async Task Seed()
         {
+            if (dbContext.Database.GetPendingMigrations().Any()) 
+            {
+                await dbContext.Database.MigrateAsync();
+            }
             if (await dbContext.Database.CanConnectAsync())
             {
                 if (!dbContext.Restaurants.Any())
@@ -52,6 +57,7 @@ namespace Restaurants.Infrastructure.Seeders
         }
         private IEnumerable<IdentityRole> GetRoles()
         {
+       
             List<IdentityRole> roles =
                 [
                    new (UserRoles.User){
@@ -89,9 +95,17 @@ namespace Restaurants.Infrastructure.Seeders
         }
         private IEnumerable<Restaurant> GetRestaurants()
         {
+            string email = "seed-owner@test.com";
+            var owner = new User()
+            {
+                Email = email,
+                NormalizedEmail = email.ToUpper()
+
+            };
             List<Restaurant> restaurants = [
                 new()
                 {
+                    Owner = owner,
                     Name = "KFC",
                     Category = "Fast Food",
                     Description =
@@ -123,6 +137,7 @@ namespace Restaurants.Infrastructure.Seeders
                 },
                 new()
                 {
+                    Owner = owner,
                     Name = "McDonald",
                     Category = "Fast Food",
                     Description =
