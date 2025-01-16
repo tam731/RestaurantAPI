@@ -7,29 +7,17 @@ using Restaurants.Infrastructure.Persistence;
 
 namespace Restaurants.Infrastructure.Seeders
 {
-    internal class RestaurantSeeder(UserManager<User> userManager,RestaurantsDbContext dbContext) :  IRestaurantSeeder
+    internal class RestaurantSeeder(UserManager<User> userManager, RestaurantsDbContext dbContext) : IRestaurantSeeder
     {
         public async Task Seed()
         {
-            if (dbContext.Database.GetPendingMigrations().Any()) 
+            if (dbContext.Database.GetPendingMigrations().Any())
             {
                 await dbContext.Database.MigrateAsync();
             }
+
             if (await dbContext.Database.CanConnectAsync())
             {
-                if (!dbContext.Restaurants.Any())
-                {
-                    var restaurants = GetRestaurants();
-                    dbContext.Restaurants.AddRange(restaurants);
-                    await dbContext.SaveChangesAsync();
-                }
-
-                if (!dbContext.Roles.Any())
-                {
-                    dbContext.Roles.AddRange(GetRoles());
-                    await dbContext.SaveChangesAsync();
-                }
-
                 if (!dbContext.Users.Any())
                 {
                     var users = GetUsers();
@@ -41,23 +29,38 @@ namespace Restaurants.Infrastructure.Seeders
                             case "admin@test.com":
                                 await userManager.AddToRoleAsync(user, UserRoles.Admin);
                                 break;
+
                             case "owner@test.com":
                                 await userManager.AddToRoleAsync(user, UserRoles.Owner);
                                 break;
+
                             case "user@test.com":
                                 await userManager.AddToRoleAsync(user, UserRoles.User);
                                 break;
-
                         }
-
+                    }
+                }
+                if (!dbContext.Restaurants.Any())
+                {
+                    var owner = dbContext.Users.Where(u => u.Email == "owner@test.com").FirstOrDefault();
+                    if (owner is not null)
+                    {
+                        var restaurants = GetRestaurants(owner.Id.ToString());
+                        dbContext.Restaurants.AddRange(restaurants);
+                        await dbContext.SaveChangesAsync();
                     }
                 }
 
+                if (!dbContext.Roles.Any())
+                {
+                    dbContext.Roles.AddRange(GetRoles());
+                    await dbContext.SaveChangesAsync();
+                }
             }
         }
+
         private IEnumerable<IdentityRole> GetRoles()
         {
-       
             List<IdentityRole> roles =
                 [
                    new (UserRoles.User){
@@ -72,40 +75,38 @@ namespace Restaurants.Infrastructure.Seeders
                 ];
             return roles;
         }
+
         private IEnumerable<User> GetUsers()
         {
-             IEnumerable<User> users = [
-                new (){
+            IEnumerable<User> users = [
+               new (){
                     UserName="admin@test.com",
                     NormalizedEmail="admin@test.com".ToUpper(),
                     Email="admin@test.com",
+                    Nationality="Vietnamese"
                 },
                 new (){
                      UserName="owner@test.com",
                     NormalizedEmail="owner@test.com".ToUpper(),
                     Email="owner@test.com",
+                    Nationality="Vietnamese"
                 },
                 new (){
                      UserName="user@test.com",
                     NormalizedEmail="user@test.com".ToUpper(),
                     Email="user@test.com",
+                    Nationality="Vietnamese"
                 }
-                ];
+               ];
             return users;
         }
-        private IEnumerable<Restaurant> GetRestaurants()
-        {
-            string email = "seed-owner@test.com";
-            var owner = new User()
-            {
-                Email = email,
-                NormalizedEmail = email.ToUpper()
 
-            };
+        private IEnumerable<Restaurant> GetRestaurants(string ownerId)
+        {
             List<Restaurant> restaurants = [
                 new()
                 {
-                    Owner = owner,
+                    OwnerId = ownerId,
                     Name = "KFC",
                     Category = "Fast Food",
                     Description =
@@ -137,7 +138,7 @@ namespace Restaurants.Infrastructure.Seeders
                 },
                 new()
                 {
-                    Owner = owner,
+                    OwnerId = ownerId,
                     Name = "McDonald",
                     Category = "Fast Food",
                     Description =
@@ -155,7 +156,5 @@ namespace Restaurants.Infrastructure.Seeders
 
             return restaurants;
         }
-
-
     }
 }

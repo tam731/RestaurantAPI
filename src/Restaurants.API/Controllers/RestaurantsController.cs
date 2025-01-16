@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Restaurants.Application.Restaurants.Commands.CreateRestaurant;
 using Restaurants.Application.Restaurants.Commands.DeleteRestaurant;
 using Restaurants.Application.Restaurants.Commands.UpdateRestaurant;
+using Restaurants.Application.Restaurants.Commands.UploadRestaurantLogo;
 using Restaurants.Application.Restaurants.Queries.GetAllRestaurants;
 using Restaurants.Application.Restaurants.Queries.GetRestaurantById;
 using Restaurants.Domain.Constants;
@@ -19,7 +20,7 @@ namespace Restaurants.API.Controllers
         [HttpGet]
         [AllowAnonymous]
         //[Authorize(Policy =PolicyNames.CreatedAtLeast2Restaurants)]
-        public async Task<IActionResult> GetAll([FromQuery]GetAllRestaurantsQuery query)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllRestaurantsQuery query)
         {
             var restaurants = await mediator.Send(query);
             return Ok(restaurants);
@@ -59,6 +60,22 @@ namespace Restaurants.API.Controllers
         public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
         {
             await mediator.Send(new DeleteRestaurantCommand(id));
+            return NoContent();
+        }
+
+
+        [HttpPost("{id}/upload-logo")]
+        public async Task<IActionResult> UploadLogo([FromRoute]int id,IFormFile file)
+        {
+            using var stream=file.OpenReadStream();
+            var command = new UploadRestaurantLogoCommand()
+            {
+                RestaurantId = id,
+                FileName = $"{id}-{file.FileName}",
+                File = stream
+            };
+
+            await mediator.Send(command);
             return NoContent();
         }
     }
