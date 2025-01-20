@@ -54,7 +54,7 @@ internal class BlobStorageService(IOptions<BlobStorageSettings> options) : IBlob
         {
             BlobContainerName=_blobStorageSettings.LogosContainerName,
             Resource="b",
-            StartsOn=DateTimeOffset.UtcNow,
+            StartsOn=DateTimeOffset.UtcNow.AddMinutes(-5),
             ExpiresOn=DateTimeOffset.UtcNow.AddMinutes(30),
             BlobName= GetBlobNameFromUrl(blobUrl)
 
@@ -66,7 +66,6 @@ internal class BlobStorageService(IOptions<BlobStorageSettings> options) : IBlob
         var sasToken = sasBuilder.ToSasQueryParameters(
                 new Azure.Storage.StorageSharedKeyCredential(blobServiceClient.AccountName, _blobStorageSettings.AccountKey))
                 .ToString();
-
         return $"{blobUrl}?{sasToken}";
         //blob:https://tamlvsadev.blob.core.windows.net/logos/images.png
         //sas: sp=r&st=2025-01-16T03:47:18Z&se=2025-01-17T11:47:18Z&spr=https&sv=2022-11-02&sr=b&sig=QTkNBejWCw6Y8HAqeyKB5%2FHPUbvy28a3FYJelZfjhFc%3D
