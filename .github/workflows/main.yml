@@ -24,4 +24,4 @@ jobs:
         - name: Test
           env:
             ASPNETCORE_ENVIRONMENT: Development
-          run: dotnet test
+          run: dotnet test --no-build --logger "trx;LogFileName=test_results.trx"
