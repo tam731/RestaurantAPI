@@ -11,51 +11,59 @@ namespace Restaurants.Infrastructure.Seeders
     {
         public async Task Seed()
         {
-            if (dbContext.Database.GetPendingMigrations().Any())
+            try
             {
-                await dbContext.Database.MigrateAsync();
-            }
-
-            if (await dbContext.Database.CanConnectAsync())
-            {
-                if (!dbContext.Users.Any())
+                if (dbContext.Database.GetPendingMigrations().Any())
                 {
-                    var users = GetUsers();
-                    foreach (var user in users)
+                    await dbContext.Database.MigrateAsync();
+                }
+
+                if (await dbContext.Database.CanConnectAsync())
+                {
+                    if (!dbContext.Roles.Any())
                     {
-                        await userManager.CreateAsync(user, "User123@");
-                        switch (user.Email)
+                        dbContext.Roles.AddRange(GetRoles());
+                        await dbContext.SaveChangesAsync();
+                    }
+
+                    if (!dbContext.Users.Any())
+                    {
+                        var users = GetUsers();
+                        foreach (var user in users)
                         {
-                            case "admin@test.com":
-                                await userManager.AddToRoleAsync(user, UserRoles.Admin);
-                                break;
+                            await userManager.CreateAsync(user, "User123@");
+                            switch (user.Email)
+                            {
+                                case "admin@test.com":
+                                    await userManager.AddToRoleAsync(user, UserRoles.Admin);
+                                    break;
 
-                            case "owner@test.com":
-                                await userManager.AddToRoleAsync(user, UserRoles.Owner);
-                                break;
+                                case "owner@test.com":
+                                    await userManager.AddToRoleAsync(user, UserRoles.Owner);
+                                    break;
 
-                            case "user@test.com":
-                                await userManager.AddToRoleAsync(user, UserRoles.User);
-                                break;
+                                case "user@test.com":
+                                    await userManager.AddToRoleAsync(user, UserRoles.User);
+                                    break;
+                            }
+                        }
+                    }
+                    if (!dbContext.Restaurants.Any())
+                    {
+                        var owner = dbContext.Users.Where(u => u.Email == "owner@test.com").FirstOrDefault();
+                        if (owner is not null)
+                        {
+                            var restaurants = GetRestaurants(owner.Id.ToString());
+                            dbContext.Restaurants.AddRange(restaurants);
+                            await dbContext.SaveChangesAsync();
                         }
                     }
                 }
-                if (!dbContext.Restaurants.Any())
-                {
-                    var owner = dbContext.Users.Where(u => u.Email == "owner@test.com").FirstOrDefault();
-                    if (owner is not null)
-                    {
-                        var restaurants = GetRestaurants(owner.Id.ToString());
-                        dbContext.Restaurants.AddRange(restaurants);
-                        await dbContext.SaveChangesAsync();
-                    }
-                }
+            }
+            catch (Exception ex)
+            {
 
-                if (!dbContext.Roles.Any())
-                {
-                    dbContext.Roles.AddRange(GetRoles());
-                    await dbContext.SaveChangesAsync();
-                }
+                throw new Exception(ex.Message);
             }
         }
 

@@ -44,3 +44,4 @@ msbuild.err
 msbuild.wrn
 
 src/Restaurants.API/Properties/PublishProfiles/*
+api/
