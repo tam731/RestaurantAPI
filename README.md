@@ -1,4 +1,4 @@
-# RestaurantAPI
+# Restaurant API
 Build .NET 8 APIs in Clean Architecture, user Identity system and Azure deployment using CI/CD .
 # Description
 - Project Description: Building a Scalable and Maintainable RESTful API Using ASP.NET Core 8 and Azure
