@@ -26,7 +26,7 @@ public class UserContextTests
 
         var claims = new List<Claim>()
         {
-            new(ClaimTypes.NameIdentifier,"1"),
+            new(ClaimTypes.NameIdentifier,"2"),
             new(ClaimTypes.Email,"test1@test.com"),
             new(ClaimTypes.Role,UserRoles.Admin),
             new(ClaimTypes.Role,UserRoles.User),
