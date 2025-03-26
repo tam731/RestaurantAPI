@@ -24,7 +24,7 @@ public class CreateRestaurantCommandHandler(IRestaurantsRepository restaurantsRe
 
         try
         {
-            var currUser=userContext.GetCurrentUser();
+            var currUser = userContext.GetCurrentUser();
             restaurant.OwnerId = currUser!.Id;
             int id = await restaurantsRepository.CreateAsync(restaurant);
             return id;

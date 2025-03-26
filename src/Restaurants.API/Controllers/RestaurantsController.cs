@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Restaurants.API.Attributes;
 using Restaurants.Application.Restaurants.Commands.CreateRestaurant;
 using Restaurants.Application.Restaurants.Commands.DeleteRestaurant;
 using Restaurants.Application.Restaurants.Commands.UpdateRestaurant;
@@ -8,6 +9,7 @@ using Restaurants.Application.Restaurants.Commands.UploadRestaurantLogo;
 using Restaurants.Application.Restaurants.Queries.GetAllRestaurants;
 using Restaurants.Application.Restaurants.Queries.GetRestaurantById;
 using Restaurants.Domain.Constants;
+using Restaurants.Domain.Interfaces;
 using Restaurants.Infrastructure.Authorization;
 
 namespace Restaurants.API.Controllers
@@ -15,11 +17,12 @@ namespace Restaurants.API.Controllers
     [ApiController]
     [Route("api/restaurants")]
     [Authorize]
-    public class RestaurantsController(IMediator mediator) : ControllerBase
+    public class RestaurantsController(IMediator mediator, IResponseCacheService responseCacheService) : ControllerBase
     {
         [HttpGet]
         [AllowAnonymous]
         //[Authorize(Policy =PolicyNames.CreatedAtLeast2Restaurants)]
+        [Cache(1000)]
         public async Task<IActionResult> GetAll([FromQuery] GetAllRestaurantsQuery query)
         {
             var restaurants = await mediator.Send(query);
@@ -28,6 +31,7 @@ namespace Restaurants.API.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Policy = PolicyNames.HasNationality)]
+        [Cache(1000)]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var restaurant = await mediator.Send(new GetRestaurantByIdQuery(id));
@@ -41,6 +45,7 @@ namespace Restaurants.API.Controllers
         public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantCommand command)
         {
             int id = await mediator.Send(command);
+            await responseCacheService.RemoveCacheResponseAsync("api/restaurants");
             return CreatedAtAction(nameof(GetById), new { id }, null);
         }
 
@@ -51,6 +56,7 @@ namespace Restaurants.API.Controllers
         {
             command.Id = id;
             await mediator.Send(command);
+            await responseCacheService.RemoveCacheResponseAsync("api/restaurants");
             return NoContent();
         }
 
@@ -60,6 +66,7 @@ namespace Restaurants.API.Controllers
         public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
         {
             await mediator.Send(new DeleteRestaurantCommand(id));
+            await responseCacheService.RemoveCacheResponseAsync("api/restaurants");
             return NoContent();
         }
 

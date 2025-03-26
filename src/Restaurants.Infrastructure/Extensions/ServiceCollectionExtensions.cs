@@ -12,9 +12,11 @@ using Restaurants.Infrastructure.Authorization.Requirements;
 using Restaurants.Infrastructure.Authorization.Services;
 using Restaurants.Infrastructure.Configuration;
 using Restaurants.Infrastructure.Persistence;
+using Restaurants.Infrastructure.RedisCache;
 using Restaurants.Infrastructure.Repositories;
 using Restaurants.Infrastructure.Seeders;
 using Restaurants.Infrastructure.Storage;
+using StackExchange.Redis;
 
 namespace Restaurants.Infrastructure.Extensions
 {
@@ -22,10 +24,12 @@ namespace Restaurants.Infrastructure.Extensions
     {
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            string connectionstring = configuration.GetConnectionString("RestaurantsDb")!;
+            //Add db configuration
+            string connectionString = configuration.GetConnectionString("RestaurantsDb")!;
             services.AddDbContext<RestaurantsDbContext>(options =>
-                options.UseSqlServer(connectionstring)
+                options.UseSqlServer(connectionString)
                         .EnableSensitiveDataLogging());
+        
             // Add Identity services
             //services.AddIdentity<User, IdentityRole>()
             //        .AddEntityFrameworkStores<RestaurantsDbContext>()
@@ -55,6 +59,23 @@ namespace Restaurants.Infrastructure.Extensions
 
             services.Configure<BlobStorageSettings>(configuration.GetSection("BlobStorage"));
             services.AddScoped<IBlobStorageService,BlobStorageService>();
+
+            //Add Redis configuration
+            AddRedisConfiguration(services, configuration);
+
+        }
+        private static void AddRedisConfiguration(IServiceCollection services, IConfiguration configuration)
+        {
+            var redisConfiguration = new RedisConfiguration();
+            configuration.GetSection("RedisConfiguration").Bind(redisConfiguration);
+            services.AddSingleton(redisConfiguration);
+
+            if (redisConfiguration.Enabled) 
+            { 
+                services.AddSingleton<IConnectionMultiplexer>(_=>ConnectionMultiplexer.Connect(redisConfiguration.ConnectionString));
+                services.AddStackExchangeRedisCache(option=>option.Configuration=redisConfiguration.ConnectionString);
+                services.AddSingleton<IResponseCacheService, ResponseCacheService>();
+            }
         }
     }
 }
