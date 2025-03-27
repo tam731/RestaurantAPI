@@ -45,7 +45,7 @@ namespace Restaurants.API.Controllers
         public async Task<IActionResult> CreateRestaurant([FromBody] CreateRestaurantCommand command)
         {
             int id = await mediator.Send(command);
-            await responseCacheService.RemoveCacheResponseAsync("api/restaurants");
+            await responseCacheService.RemoveCacheResponseAsync("/api/restaurants");
             return CreatedAtAction(nameof(GetById), new { id }, null);
         }
 
@@ -56,7 +56,7 @@ namespace Restaurants.API.Controllers
         {
             command.Id = id;
             await mediator.Send(command);
-            await responseCacheService.RemoveCacheResponseAsync("api/restaurants");
+            await responseCacheService.RemoveCacheResponseAsync("/api/restaurants");
             return NoContent();
         }
 
@@ -66,7 +66,7 @@ namespace Restaurants.API.Controllers
         public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
         {
             await mediator.Send(new DeleteRestaurantCommand(id));
-            await responseCacheService.RemoveCacheResponseAsync("api/restaurants");
+            await responseCacheService.RemoveCacheResponseAsync("/api/restaurants");
             return NoContent();
         }
 

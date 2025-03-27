@@ -22,7 +22,7 @@ public class DishesController(IMediator mediator, IResponseCacheService response
     {
         command.RestaurantId = restaurantId;
         var dishId = await mediator.Send(command);
-        await responseCacheService.RemoveCacheResponseAsync($"api/restaurants/{restaurantId}/dishes");
+        await responseCacheService.RemoveCacheResponseAsync($"/api/restaurants/{restaurantId}/dishes");
         return CreatedAtAction(nameof(GetByIdForRestaurant), new { restaurantId , dishId },null);
     }
 
@@ -47,7 +47,7 @@ public class DishesController(IMediator mediator, IResponseCacheService response
     public async Task<ActionResult<IEnumerable<DishDTO>>> DeleteDishesForRestaurant([FromRoute] int restaurantId)
     {
         await mediator.Send(new DeleteDishesForRestaurantCommand(restaurantId));
-        await responseCacheService.RemoveCacheResponseAsync($"api/restaurants/{restaurantId}/dishes");
+        await responseCacheService.RemoveCacheResponseAsync($"/api/restaurants/{restaurantId}/dishes");
         return NoContent();
     }
 }

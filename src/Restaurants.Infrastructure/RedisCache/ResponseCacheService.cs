@@ -27,7 +27,7 @@ internal class ResponseCacheService : IResponseCacheService
     {
         if (string.IsNullOrWhiteSpace(pattern))
             throw new ArgumentNullException("Value cannot be null or whitespace");
-        
+
         await foreach (var key in GetKeyAsync(pattern + "*"))
         {
             await _distributedCache.RemoveAsync(key);
